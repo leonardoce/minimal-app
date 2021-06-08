@@ -3,7 +3,6 @@ FROM golang:alpine3.13 AS build
 WORKDIR /app
 COPY go.mod go.sum /app/
 COPY cmd /app/cmd/
-RUN ls -laR
 RUN go mod download
 RUN go build -o bin/minimal-app cmd/minimal-app/main.go
 
