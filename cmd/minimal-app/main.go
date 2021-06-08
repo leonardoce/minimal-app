@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -47,6 +48,7 @@ func main() {
 	// https://prometheus.io/docs/guides/go-application/
 	mux.Handle("/metrics", promhttp.Handler())
 
+	log.Println("Starting web server")
 	err := http.ListenAndServe(":5000", handlers.LoggingHandler(os.Stdout, mux))
 	if err != nil {
 		panic(err)
