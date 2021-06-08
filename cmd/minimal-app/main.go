@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/handlers"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -41,12 +42,12 @@ func main() {
 	color = os.Getenv("COLOR")
 	environment = os.Getenv("ENVIRONMENT")
 
-	http.HandleFunc("/", rootPage)
-
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", rootPage)
 	// https://prometheus.io/docs/guides/go-application/
-	http.Handle("/metrics", promhttp.Handler())
+	mux.Handle("/metrics", promhttp.Handler())
 
-	err := http.ListenAndServe(":5000", nil)
+	err := http.ListenAndServe(":5000", handlers.LoggingHandler(os.Stdout, mux))
 	if err != nil {
 		panic(err)
 	}
