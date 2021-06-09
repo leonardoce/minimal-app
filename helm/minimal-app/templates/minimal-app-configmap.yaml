@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  COLOR: {{ .Values.minimal.color }}
+  ENVIRONMENT: {{ .Values.minimal.environment }}
+  LISTEN_ADDRESS: :8000
+  DATABASE_URL: host={{ include "minimal-app.fullname" . }}-db user={{ .Values.pg.user }} password={{ .Values.pg.password }} sslmode=disable
+kind: ConfigMap
+metadata:
+  name: {{ include "minimal-app.fullname" . }}
+  labels:
+    {{- include "minimal-app.labels" . | nindent 4 }}

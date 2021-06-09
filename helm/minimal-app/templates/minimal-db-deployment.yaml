@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "minimal-app.fullname" . }}-db
+  labels:
+    {{- include "minimal-app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "minimal-app.selectorLabelsDB" . | nindent 6 }}
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        {{- include "minimal-app.selectorLabelsDB" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/minimal-db-configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - image: postgres:13
+        name: postgres
+        ports:
+        - name: "psql"
+          containerPort: 5432
+          protocol: "TCP"
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        env:
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        envFrom:
+        - configMapRef:
+            name: {{ include "minimal-app.fullname" . }}-db
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/
+          name: pgdata
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: pgdata
+        persistentVolumeClaim:
+          claimName: {{ include "minimal-app.fullname" . }}-db
+status: {}

@@ -1,0 +1,10 @@
+minimal:
+  color: red
+  environment: development
+
+image:
+  repository: "minimal-app"
+  tag: "dev"
+
+pg:
+  password: minimal-app
